@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eae8e5">
+  
+<title>Comparateur d&#39;abonnements d&#39;électricité · Jean-Christophe VASSELON</title>
+<meta name="description" content="Simule plus de 50 offres d&#39;électricité sur votre vraie consommation Linky, directement dans le navigateur, sans partage de données.">
+<link rel="canonical" href="https://jc.vasselon.com/projets/comparateur-electricite/">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Jean-Christophe VASSELON">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Comparateur d&#39;abonnements d&#39;électricité">
+<meta property="og:description" content="Simule plus de 50 offres d&#39;électricité sur votre vraie consommation Linky, directement dans le navigateur, sans partage de données.">
+<meta property="og:url" content="https://jc.vasselon.com/projets/comparateur-electricite/">
+<meta property="og:image" content="https://jc.vasselon.com/assets/projects/comparateur-electricite.png">
+<meta property="og:image:alt" content="Logo de Comparateur d&#39;abonnements d&#39;électricité">
+
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Comparateur d'abonnements d'électricité","description":"Simule plus de 50 offres d'électricité sur votre vraie consommation Linky, directement dans le navigateur, sans partage de données.","url":"https://jc.vasselon.com/projets/comparateur-electricite/","inLanguage":"fr","mainEntity":{"@type":"WebApplication","name":"Comparateur d'abonnements d'électricité","description":"Simule plus de 50 offres d'électricité sur votre vraie consommation Linky, directement dans le navigateur, sans partage de données.","creator":{"@type":"Person","@id":"https://jc.vasselon.com/experiences/#person","name":"Jean-Christophe VASSELON","url":"https://jc.vasselon.com/experiences/","sameAs":["https://www.linkedin.com/in/jvasselon/","https://github.com/JC144","https://x.com/JCVasselon"]},"url":"https://comparateur-abonnements-electricite.fr/","image":"https://jc.vasselon.com/assets/projects/comparateur-electricite.png"}}</script>
+
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script>
+    (() => {
+  const root = document.documentElement;
+  const motion = matchMedia("(prefers-reduced-motion: no-preference)");
+  const storageKey = "jcvasselon:page-arrival";
+  let departure;
+
+  try {
+    const arrival = JSON.parse(sessionStorage.getItem(storageKey));
+    sessionStorage.removeItem(storageKey);
+    if (motion.matches && arrival?.href === location.href && ["forward", "backward"].includes(arrival.direction)) {
+      root.dataset.pageEnter = arrival.direction;
+    }
+  } catch {
+    // Une navigation reste possible si le stockage est indisponible.
+  }
+
+  function clearDeparture() {
+    departure = undefined;
+    delete root.dataset.pageExit;
+  }
+
+  function clearArrival(event) {
+    if (event.animationName === "page-slide-in" && event.target.matches(".site-footer")) {
+      delete root.dataset.pageEnter;
+    }
+  }
+
+  document.addEventListener("animationend", clearArrival);
+  document.addEventListener("animationcancel", clearArrival);
+
+  function skipNativeTransition(viewTransition) {
+    // La promesse ready est rejetée quand la transition native est annulée.
+    viewTransition.ready.catch(() => {});
+    viewTransition.skipTransition();
+  }
+
+  window.addEventListener("pageswap", ({ viewTransition }) => {
+    if (departure && viewTransition) skipNativeTransition(viewTransition);
+  });
+
+  window.addEventListener("pagereveal", ({ viewTransition }) => {
+    const activation = window.navigation?.activation;
+    if (!motion.matches || !viewTransition || activation?.navigationType !== "traverse" || !activation.from) return;
+
+    root.dataset.pageEnter = activation.entry.index < activation.from.index ? "backward" : "forward";
+    skipNativeTransition(viewTransition);
+  });
+
+  window.addEventListener("pagehide", () => {
+    clearDeparture();
+    delete root.dataset.pageEnter;
+  });
+
+  document.addEventListener("click", async (event) => {
+    if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+
+    const link = event.target.closest?.("a[href]");
+    if (!(link instanceof HTMLAnchorElement) || (link.target && link.target !== "_self") || link.hasAttribute("download")) return;
+
+    const movesToAnotherPage = link.pathname !== location.pathname || link.search !== location.search;
+    if (!motion.matches || link.origin !== location.origin || !["http:", "https:"].includes(link.protocol) || !movesToAnotherPage) {
+      clearDeparture();
+      return;
+    }
+
+    const pivotLinks = Array.from(document.querySelectorAll(".pivot a[href]"));
+    const currentIndex = pivotLinks.findIndex((item) => item.hasAttribute("aria-current"));
+    // Les fiches reprennent l’onglet de leur rubrique, y compris sous un préfixe de déploiement.
+    const nextTab = pivotLinks.filter((item) => link.pathname.startsWith(item.pathname))
+      .sort((a, b) => b.pathname.length - a.pathname.length)[0];
+    const nextIndex = pivotLinks.indexOf(nextTab);
+    const returnsToSection = nextTab?.pathname === link.pathname && nextIndex === currentIndex && nextTab.getAttribute("aria-current") === "location";
+    const movesBackward = link.relList.contains("prev") || (nextIndex >= 0 && (nextIndex < currentIndex || returnsToSection));
+
+    event.preventDefault();
+    const currentTab = pivotLinks[currentIndex];
+    if (currentTab && nextTab) {
+      const from = currentTab.getBoundingClientRect();
+      const to = nextTab.getBoundingClientRect();
+      currentTab.style.setProperty("--tab-x", `${to.left - from.left}px`);
+      currentTab.style.setProperty("--tab-y", `${to.bottom - from.bottom}px`);
+      currentTab.style.setProperty("--tab-scale", to.width / from.width);
+    }
+    const next = { href: link.href, direction: movesBackward ? "backward" : "forward" };
+    departure = next;
+    delete root.dataset.pageEnter;
+    root.dataset.pageExit = next.direction;
+
+    const main = document.getElementById("contenu");
+    const animation = main?.getAnimations?.().find((item) => item.animationName === "page-slide-out");
+    await animation?.finished.catch(() => {});
+    if (departure !== next) return;
+
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify(next));
+    } catch {
+      // Le lien reste utilisable si le stockage est indisponible.
+    }
+    location.assign(next.href);
+  });
+})();
+
+  </script>
+</head>
+<body class="page-projets">
+  <a class="skip-link" href="#contenu">Aller au contenu</a>
+  <header class="site-header" id="haut">
+    <nav class="frame" aria-label="Navigation principale">
+      <a class="brand" href="/" aria-label="Jean-Christophe VASSELON, accueil">Jean-Christophe<br>VASSELON</a>
+      <div class="pivot">
+        
+          <a href="/">Accueil</a>
+        
+          <a href="/projets/" aria-current="location">Projets</a>
+        
+          <a href="/articles/">Articles</a>
+        
+          <a href="/experiences/">Expériences</a>
+        
+      </div>
+    </nav>
+    
+  </header>
+  <main id="contenu" tabindex="-1">
+    <article class="frame detail-page">
+  <header class="detail-heading" data-enter-block="" style="--enter-index: 0">
+    <div class="detail-meta">
+      
+        <p class="metadata">En production</p>
+      
+    </div>
+    <h1>Comparateur d&#39;abonnements d&#39;électricité</h1>
+    <p class="page-lead">Simule plus de 50 offres d&#39;électricité sur votre vraie consommation Linky, directement dans le navigateur, sans partage de données.</p>
+    
+  </header>
+  <div class="article-body"><div data-enter-block="with-previous" style="--enter-index: 0"><div class="project-links">
+    
+      <a class="text-link" href="https://comparateur-abonnements-electricite.fr/">Voir le site</a>
+    
+    
+      <a class="text-link" href="https://github.com/JC144/EDF_Simulateur_Prix">Voir le code source</a>
+    
+  </div>
+
+
+  <p>Le comparateur rejoue votre propre historique de consommation Linky sur les offres d'électricité du marché, pour savoir combien vous auriez payé sur un an avec chacune. Un prix réel, contrairement à une comparaison avec un foyer type.</p>
+</div><section data-enter-block="" style="--enter-index: 1"><h2>Ce qu'il fait</h2>
+<ul>
+<li>Simule 53 offres de 9 fournisseurs : tarifs réglementés EDF (Bleu, Tempo, EJP), offres de marché et tarifs maintenus par la communauté.</li>
+<li>Applique les vraies couleurs des jours Tempo, les jours EJP et les plages d'heures creuses de chaque contrat.</li>
+<li>Utilise les prix spot EPEX réels pour les offres indexées sur le marché de gros.</li>
+<li>Classe les résultats par coût annuel, abonnement proratisé au jour près.</li>
+</ul>
+</section><section data-enter-block="" style="--enter-index: 2"><h2>Comment ça marche</h2>
+<p>Vous importez un export de consommation au pas de 30 minutes (EDF, Enedis, TotalEnergies, Strasbourg Électricité Réseaux ou Home Assistant), ou vous récupérez votre courbe de charge depuis votre compte Enedis grâce à un script qui tourne dans votre navigateur. Vous réglez la puissance souscrite et vos heures creuses, et le classement s'affiche.</p>
+</section><section data-enter-block="" style="--enter-index: 3"><h2>100 % local</h2>
+<p>Vos données Linky ne quittent jamais votre navigateur : pas de cookies, pas de traceurs, pas de mesure d'audience. L'outil est gratuit, sans inscription, sans publicité, et aucun fournisseur ne le rémunère.</p>
+
+
+
+  </section></div>
+  
+</article>
+
+  </main>
+  <footer class="site-footer" data-enter-block="with-previous" style="--enter-index: 3">
+    <div class="frame footer-inner">
+      <span class="footer-name">Jean-Christophe<br>VASSELON</span>
+      <ul class="social-list" role="list" aria-label="Profils sociaux">
+  <!-- Bootstrap Icons (https://github.com/twbs/icons)
+The MIT License (MIT)
+
+Copyright (c) 2019-2024 The Bootstrap Authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+
+  
+    
+      <li>
+        <a class="social-item" href="https://www.linkedin.com/in/jvasselon/" aria-label="LinkedIn">
+          
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248s-1.359.54-1.359 1.248c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.4V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"></path>
+</svg>
+
+          
+        </a>
+      </li>
+    
+  
+    
+      <li>
+        <a class="social-item" href="https://github.com/JC144" aria-label="GitHub">
+          
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8"></path>
+</svg>
+
+          
+        </a>
+      </li>
+    
+  
+    
+      <li>
+        <a class="social-item" href="https://x.com/JCVasselon" aria-label="X">
+          
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633zm-.86 13.028h1.36L4.323 2.145H2.865z"></path>
+</svg>
+
+          
+        </a>
+      </li>
+    
+  
+</ul>
+
+      <a class="back-top" href="#haut">Retour en haut <span aria-hidden="true">↑</span></a>
+    </div>
+  </footer>
+  <script>
+    (() => {
+      if (!("IntersectionObserver" in window) || !matchMedia("(prefers-reduced-motion: no-preference)").matches) return;
+
+      const footer = document.querySelector(".site-footer");
+      const list = footer.querySelector(".social-list");
+      Array.from(list.children).forEach((item, index) => item.style.setProperty("--social-index", index));
+      list.dataset.socialReveal = "pending";
+
+      const observer = new IntersectionObserver(async ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        // Sur une page courte, attendre la fin de l’entrée du pied de page.
+        const arrival = footer.getAnimations?.().find((animation) => animation.animationName === "page-slide-in");
+        if (arrival) await arrival.finished.catch(() => {});
+        list.dataset.socialReveal = "visible";
+      });
+      observer.observe(list);
+    })();
+  </script>
+</body>
+</html>

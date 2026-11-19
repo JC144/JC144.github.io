@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eae8e5">
+  
+<title>Lecture : The Snowball Effect · Jean-Christophe VASSELON</title>
+<meta name="description" content="Ce que je retiens de la biographie de Warren Buffett, de ses premiers investissements à sa façon de choisir et de gérer des entreprises.">
+<link rel="canonical" href="https://jc.vasselon.com/articles/bio-warren-buffett/">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Jean-Christophe VASSELON">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lecture : The Snowball Effect">
+<meta property="og:description" content="Ce que je retiens de la biographie de Warren Buffett, de ses premiers investissements à sa façon de choisir et de gérer des entreprises.">
+<meta property="og:url" content="https://jc.vasselon.com/articles/bio-warren-buffett/">
+<meta property="og:image" content="https://jc.vasselon.com/assets/escalier-corail.jpg">
+<meta property="og:image:alt" content="Un escalier en béton devant un disque corail.">
+<meta property="article:published_time" content="2019-05-20T00:00:00.000Z">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","name":"Lecture : The Snowball Effect","description":"Ce que je retiens de la biographie de Warren Buffett, de ses premiers investissements à sa façon de choisir et de gérer des entreprises.","url":"https://jc.vasselon.com/articles/bio-warren-buffett/","inLanguage":"fr","headline":"Lecture : The Snowball Effect","datePublished":"2019-05-20T00:00:00.000Z","author":{"@type":"Person","@id":"https://jc.vasselon.com/experiences/#person","name":"Jean-Christophe VASSELON","url":"https://jc.vasselon.com/experiences/","sameAs":["https://www.linkedin.com/in/jvasselon/","https://github.com/JC144","https://x.com/JCVasselon"]},"mainEntityOfPage":"https://jc.vasselon.com/articles/bio-warren-buffett/"}</script>
+
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script>
+    (() => {
+  const root = document.documentElement;
+  const motion = matchMedia("(prefers-reduced-motion: no-preference)");
+  const storageKey = "jcvasselon:page-arrival";
+  let departure;
+
+  try {
+    const arrival = JSON.parse(sessionStorage.getItem(storageKey));
+    sessionStorage.removeItem(storageKey);
+    if (motion.matches && arrival?.href === location.href && ["forward", "backward"].includes(arrival.direction)) {
+      root.dataset.pageEnter = arrival.direction;
+    }
+  } catch {
+    // Une navigation reste possible si le stockage est indisponible.
+  }
+
+  function clearDeparture() {
+    departure = undefined;
+    delete root.dataset.pageExit;
+  }
+
+  function clearArrival(event) {
+    if (event.animationName === "page-slide-in" && event.target.matches(".site-footer")) {
+      delete root.dataset.pageEnter;
+    }
+  }
+
+  document.addEventListener("animationend", clearArrival);
+  document.addEventListener("animationcancel", clearArrival);
+
+  function skipNativeTransition(viewTransition) {
+    // La promesse ready est rejetée quand la transition native est annulée.
+    viewTransition.ready.catch(() => {});
+    viewTransition.skipTransition();
+  }
+
+  window.addEventListener("pageswap", ({ viewTransition }) => {
+    if (departure && viewTransition) skipNativeTransition(viewTransition);
+  });
+
+  window.addEventListener("pagereveal", ({ viewTransition }) => {
+    const activation = window.navigation?.activation;
+    if (!motion.matches || !viewTransition || activation?.navigationType !== "traverse" || !activation.from) return;
+
+    root.dataset.pageEnter = activation.entry.index < activation.from.index ? "backward" : "forward";
+    skipNativeTransition(viewTransition);
+  });
+
+  window.addEventListener("pagehide", () => {
+    clearDeparture();
+    delete root.dataset.pageEnter;
+  });
+
+  document.addEventListener("click", async (event) => {
+    if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+
+    const link = event.target.closest?.("a[href]");
+    if (!(link instanceof HTMLAnchorElement) || (link.target && link.target !== "_self") || link.hasAttribute("download")) return;
+
+    const movesToAnotherPage = link.pathname !== location.pathname || link.search !== location.search;
+    if (!motion.matches || link.origin !== location.origin || !["http:", "https:"].includes(link.protocol) || !movesToAnotherPage) {
+      clearDeparture();
+      return;
+    }
+
+    const pivotLinks = Array.from(document.querySelectorAll(".pivot a[href]"));
+    const currentIndex = pivotLinks.findIndex((item) => item.hasAttribute("aria-current"));
+    // Les fiches reprennent l’onglet de leur rubrique, y compris sous un préfixe de déploiement.
+    const nextTab = pivotLinks.filter((item) => link.pathname.startsWith(item.pathname))
+      .sort((a, b) => b.pathname.length - a.pathname.length)[0];
+    const nextIndex = pivotLinks.indexOf(nextTab);
+    const returnsToSection = nextTab?.pathname === link.pathname && nextIndex === currentIndex && nextTab.getAttribute("aria-current") === "location";
+    const movesBackward = link.relList.contains("prev") || (nextIndex >= 0 && (nextIndex < currentIndex || returnsToSection));
+
+    event.preventDefault();
+    const currentTab = pivotLinks[currentIndex];
+    if (currentTab && nextTab) {
+      const from = currentTab.getBoundingClientRect();
+      const to = nextTab.getBoundingClientRect();
+      currentTab.style.setProperty("--tab-x", `${to.left - from.left}px`);
+      currentTab.style.setProperty("--tab-y", `${to.bottom - from.bottom}px`);
+      currentTab.style.setProperty("--tab-scale", to.width / from.width);
+    }
+    const next = { href: link.href, direction: movesBackward ? "backward" : "forward" };
+    departure = next;
+    delete root.dataset.pageEnter;
+    root.dataset.pageExit = next.direction;
+
+    const main = document.getElementById("contenu");
+    const animation = main?.getAnimations?.().find((item) => item.animationName === "page-slide-out");
+    await animation?.finished.catch(() => {});
+    if (departure !== next) return;
+
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify(next));
+    } catch {
+      // Le lien reste utilisable si le stockage est indisponible.
+    }
+    location.assign(next.href);
+  });
+})();
+
+  </script>
+</head>
+<body class="page-articles">
+  <a class="skip-link" href="#contenu">Aller au contenu</a>
+  <header class="site-header" id="haut">
+    <nav class="frame" aria-label="Navigation principale">
+      <a class="brand" href="/" aria-label="Jean-Christophe VASSELON, accueil">Jean-Christophe<br>VASSELON</a>
+      <div class="pivot">
+        
+          <a href="/">Accueil</a>
+        
+          <a href="/projets/">Projets</a>
+        
+          <a href="/articles/" aria-current="location">Articles</a>
+        
+          <a href="/experiences/">Expériences</a>
+        
+      </div>
+    </nav>
+    
+  </header>
+  <main id="contenu" tabindex="-1">
+    <article class="frame detail-page">
+  <header class="detail-heading" data-enter-block="" style="--enter-index: 0">
+    <div class="detail-meta">
+      
+        <time class="metadata" datetime="2019-05-20">20 mai 2019</time>
+      
+    </div>
+    <h1>Lecture : The Snowball Effect</h1>
+    <p class="page-lead">Ce que je retiens de la biographie de Warren Buffett, de ses premiers investissements à sa façon de choisir et de gérer des entreprises.</p>
+    
+  </header>
+  <div class="article-body"><div data-enter-block="with-previous" style="--enter-index: 0"><p>J'aurai mis un peu plus d'un an à lire la biographie de Warren Buffett. Elle couvre 80 ans de la vie d'un homme très actif qui aura fait de nombreuses rencontres. Le livre va en profondeur sur les différents business qu'aura rachetés Warren Buffett ainsi que sur toutes les personnes qu'il aura croisées et avec lesquelles il aura travaillé.
+Mais surtout, ça donne une meilleure vision de <strong>l'homme</strong> et de la vision déformée que l'on a de son célèbre principe <strong>le Snowball Effect</strong>.</p>
+</div><section data-enter-block="" style="--enter-index: 1"><h2>Les intérêts cumulés (compound interest)</h2>
+<p>On parle souvent de Warren Buffett et de sa légendaire boule de neige. L'exemple souvent donné, c'est d'investir 100 pièces chaque mois. Cet investissement va rapporter des intérêts qui vont s'ajouter à notre investissement et, petit à petit, notre boule de neige va devenir de plus en plus grosse.
+On parle moins de son autre citation : <em>les arbres ne poussent jamais jusqu'aux cieux</em>.</p>
+<p>Warren Buffett était un bosseur, Warren Buffett était frugal. Warren Buffett était quelqu'un de brillant.
+Tout jeune, il travaillait comme coursier, il réinvestissait son argent. À l'adolescence, il a acheté une ferme dont il tirait un revenu. Il s'est essayé à la Bourse assez jeune.
+Il a réussi à avoir pour professeur son idole et il a ensuite pu apprendre à ses côtés. Et c'est là qu'il a forgé sa philosophie.</p>
+</section><section data-enter-block="" style="--enter-index: 2"><h2>Les fins de cigares (cigar butts)</h2>
+<p>Warren n'achetait pas <em>juste</em> régulièrement, il achetait quand <strong>la valeur était vraiment sous-estimée</strong>. Idéalement quand la valeur en Bourse flirtait avec le capital de la société. S'il pouvait vendre tous les biens de la société et ne pas perdre d'argent, la société pouvait être intéressante. Il regardait ensuite son potentiel. Attention, ce n'était pas un liquidateur, mais il n'était pas un joueur et faisait le plus souvent des deals qu'il ne pouvait pas perdre. Rapidement, il a essayé d'être majoritaire dans les sociétés dans lesquelles il investissait. Il ne prenait pas quelques actions, son objectif était de devenir majoritaire, de garder les personnes aux commandes ou de mettre de bons gérants. J'aime beaucoup la vision à la fin, où on sent vraiment qu'il s'immerge dans le métier et essaye de comprendre où peuvent être les améliorations. Un regard extérieur qui m'est très cher quand on parle d'innovation.</p>
+<p>Autre point important, Warren Buffett a la réputation d'être <strong>un vrai coffre</strong>. Il ne vend que rarement ! <em>(HODL!)</em> Mais comment investir sans entrée financière ? En faisant des prêts ? Warren Buffett est <strong>contre les prêts</strong>, c'est un risque, il n'aime pas le risque.</p>
+<p>Il a ainsi construit de vraies machines à cash pour générer un afflux de liquidités qui sont ensuite réinvesties. Avec notamment des groupes d'assurance.
+C'est vraiment ce que je retiens de sa vie :</p>
+<ol>
+<li>Acheter des affaires sous-estimées</li>
+<li>Remettre d'aplomb ces affaires (management, réduction des coûts, remboursement des dettes…)</li>
+<li>Mettre en place des machines à cash pour pouvoir investir plus</li>
+<li>Recommencer</li>
+<li><s>Profit !</s> ou pas, puisque son but était surtout de faire grossir le capital de son groupe</li>
+</ol>
+<p><em>Les arbres ne poussent pas jusqu'aux cieux, mais ils peuvent faire plein de petites pousses !</em></p>
+<p>Au-delà de ça, l'humain est vraiment intéressant. Un peu asocial, un grand cœur et un profond sens de l'honneur. Quelqu'un d'humble, sans goût pour le luxe. <em>« Il ne mangera pas ce qu'un enfant de 3 ans ne toucherait pas. »</em></p>
+
+  </section></div>
+  
+    
+    
+    
+      <nav class="article-nav" aria-label="Navigation entre les articles" data-enter-block="" style="--enter-index: 3">
+        
+          <a class="tilt-link" rel="prev" href="/articles/the-innovators-dilemma/">
+            <span class="tilt-surface">
+              <span class="metadata"><span aria-hidden="true">←</span> Article précédent</span>
+              The Innovator’s Dilemma
+            </span>
+          </a>
+        
+        
+          <a class="tilt-link" rel="next" href="/articles/tetris-plus/">
+            <span class="tilt-surface">
+              <span class="metadata">Article suivant <span aria-hidden="true">→</span></span>
+              Tetris Plus
+            </span>
+          </a>
+        
+      </nav>
+      <script src="/assets/tilt.js" defer=""></script>
+    
+  
+</article>
+
+  </main>
+  <footer class="site-footer" data-enter-block="with-previous" style="--enter-index: 3">
+    <div class="frame footer-inner">
+      <span class="footer-name">Jean-Christophe<br>VASSELON</span>
+      <ul class="social-list" role="list" aria-label="Profils sociaux">
+  <!-- Bootstrap Icons (https://github.com/twbs/icons)
+The MIT License (MIT)
+
+Copyright (c) 2019-2024 The Bootstrap Authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+
+  
+    
+      <li>
+        <a class="social-item" href="https://www.linkedin.com/in/jvasselon/" aria-label="LinkedIn">
+          
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248s-1.359.54-1.359 1.248c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.4V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"></path>
+</svg>
+
+          
+        </a>
+      </li>
+    
+  
+    
+      <li>
+        <a class="social-item" href="https://github.com/JC144" aria-label="GitHub">
+          
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8"></path>
+</svg>
+
+          
+        </a>
+      </li>
+    
+  
+    
+      <li>
+        <a class="social-item" href="https://x.com/JCVasselon" aria-label="X">
+          
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633zm-.86 13.028h1.36L4.323 2.145H2.865z"></path>
+</svg>
+
+          
+        </a>
+      </li>
+    
+  
+</ul>
+
+      <a class="back-top" href="#haut">Retour en haut <span aria-hidden="true">↑</span></a>
+    </div>
+  </footer>
+  <script>
+    (() => {
+      if (!("IntersectionObserver" in window) || !matchMedia("(prefers-reduced-motion: no-preference)").matches) return;
+
+      const footer = document.querySelector(".site-footer");
+      const list = footer.querySelector(".social-list");
+      Array.from(list.children).forEach((item, index) => item.style.setProperty("--social-index", index));
+      list.dataset.socialReveal = "pending";
+
+      const observer = new IntersectionObserver(async ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        // Sur une page courte, attendre la fin de l’entrée du pied de page.
+        const arrival = footer.getAnimations?.().find((animation) => animation.animationName === "page-slide-in");
+        if (arrival) await arrival.finished.catch(() => {});
+        list.dataset.socialReveal = "visible";
+      });
+      observer.observe(list);
+    })();
+  </script>
+</body>
+</html>
