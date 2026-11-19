@@ -503,6 +503,18 @@ main:focus { outline: none; }
   @keyframes page-out { to { opacity: 0; transform: translateX(.5rem); } }
   @keyframes page-in { from { opacity: 0; transform: translateX(-.85rem); } }
 
+  :root:active-view-transition-type(detail)::view-transition-old(root) { animation: 150ms ease-in both page-fade-out; }
+  :root:active-view-transition-type(detail)::view-transition-new(root) { animation: 240ms ease-out both page-fade-in; }
+
+  ::view-transition-group(detail-title) {
+    z-index: 1;
+    animation-duration: 340ms;
+    animation-timing-function: var(--ease);
+  }
+  ::view-transition-old(detail-title) { animation: 120ms ease-in both page-fade-out; }
+  ::view-transition-new(detail-title) { animation: 220ms 60ms ease-out both page-fade-in; }
+  :root:active-view-transition-type(detail) :is(.project-copy h3, .detail-heading h1) { width: fit-content; }
+
   :root[data-page-enter], :root[data-page-exit] {
     overflow-x: clip;
     --slide-distance: clamp(2.5rem, 8vw, 7rem);
@@ -522,13 +534,18 @@ main:focus { outline: none; }
     transition: transform 160ms ease-in-out;
   }
 
-  [data-page-enter] [data-enter-block] {
+  [data-page-enter]:not([data-page-enter="fade"]) [data-enter-block] {
     animation: 420ms var(--ease) backwards page-slide-in;
     animation-delay: calc(var(--enter-index, 0) * 160ms);
   }
   [data-page-exit] .experience-nav,
   [data-page-exit] body > :is(main, .site-footer) { animation: 180ms ease-in both page-slide-out; }
 
+  [data-page-exit="fade"] body > :is(main, .site-footer) { animation: 150ms ease-in both page-fade-out; }
+  [data-page-enter="fade"] body > :is(main, .site-footer) { animation: 240ms ease-out both page-fade-in; }
+
+  @keyframes page-fade-in { from { opacity: 0; } }
+  @keyframes page-fade-out { to { opacity: 0; } }
   @keyframes page-slide-in { from { opacity: 0; transform: translateX(var(--slide-offset)); } }
   @keyframes page-slide-out { to { opacity: 0; transform: translateX(var(--slide-offset)); } }
 }

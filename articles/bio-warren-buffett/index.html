@@ -6,32 +6,37 @@
   <meta name="theme-color" content="#eae8e5">
   
 <title>Lecture : The Snowball Effect · Jean-Christophe VASSELON</title>
-<meta name="description" content="Ce que je retiens de la biographie de Warren Buffett, de ses premiers investissements à sa façon de choisir et de gérer des entreprises.">
+<meta name="description" content="Un retour sur la biographie de Warren Buffett, de ses premiers investissements à sa façon de choisir et de gérer des entreprises.">
 <link rel="canonical" href="https://jc.vasselon.com/articles/bio-warren-buffett/">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Jean-Christophe VASSELON">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Lecture : The Snowball Effect">
-<meta property="og:description" content="Ce que je retiens de la biographie de Warren Buffett, de ses premiers investissements à sa façon de choisir et de gérer des entreprises.">
+<meta property="og:description" content="Un retour sur la biographie de Warren Buffett, de ses premiers investissements à sa façon de choisir et de gérer des entreprises.">
 <meta property="og:url" content="https://jc.vasselon.com/articles/bio-warren-buffett/">
 <meta property="og:image" content="https://jc.vasselon.com/assets/escalier-corail.jpg">
 <meta property="og:image:alt" content="Un escalier en béton devant un disque corail.">
 <meta property="article:published_time" content="2019-05-20T00:00:00.000Z">
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","name":"Lecture : The Snowball Effect","description":"Ce que je retiens de la biographie de Warren Buffett, de ses premiers investissements à sa façon de choisir et de gérer des entreprises.","url":"https://jc.vasselon.com/articles/bio-warren-buffett/","inLanguage":"fr","headline":"Lecture : The Snowball Effect","datePublished":"2019-05-20T00:00:00.000Z","author":{"@type":"Person","@id":"https://jc.vasselon.com/experiences/#person","name":"Jean-Christophe VASSELON","url":"https://jc.vasselon.com/experiences/","sameAs":["https://www.linkedin.com/in/jvasselon/","https://github.com/JC144","https://x.com/JCVasselon"]},"mainEntityOfPage":"https://jc.vasselon.com/articles/bio-warren-buffett/"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","name":"Lecture : The Snowball Effect","description":"Un retour sur la biographie de Warren Buffett, de ses premiers investissements à sa façon de choisir et de gérer des entreprises.","url":"https://jc.vasselon.com/articles/bio-warren-buffett/","inLanguage":"fr","headline":"Lecture : The Snowball Effect","datePublished":"2019-05-20T00:00:00.000Z","author":{"@type":"Person","@id":"https://jc.vasselon.com/experiences/#person","name":"Jean-Christophe VASSELON","url":"https://jc.vasselon.com/experiences/","sameAs":["https://www.linkedin.com/in/jvasselon/","https://github.com/JC144","https://x.com/JCVasselon"]},"mainEntityOfPage":"https://jc.vasselon.com/articles/bio-warren-buffett/"}</script>
 
   <link rel="stylesheet" href="/assets/styles.css">
+  
+    <link rel="expect" href="#contenu" blocking="render">
+  
   <script>
     (() => {
   const root = document.documentElement;
   const motion = matchMedia("(prefers-reduced-motion: no-preference)");
+  const canShareTitle = "onpageswap" in window && "onpagereveal" in window &&
+    "activation" in (window.navigation ?? {}) && CSS.supports("selector(:active-view-transition-type(detail))");
   const storageKey = "jcvasselon:page-arrival";
   let departure;
 
   try {
     const arrival = JSON.parse(sessionStorage.getItem(storageKey));
     sessionStorage.removeItem(storageKey);
-    if (motion.matches && arrival?.href === location.href && ["forward", "backward"].includes(arrival.direction)) {
+    if (motion.matches && arrival?.href === location.href && ["forward", "backward", "fade"].includes(arrival.direction)) {
       root.dataset.pageEnter = arrival.direction;
     }
   } catch {
@@ -44,7 +49,7 @@
   }
 
   function clearArrival(event) {
-    if (event.animationName === "page-slide-in" && event.target.matches(".site-footer")) {
+    if (["page-slide-in", "page-fade-in"].includes(event.animationName) && event.target.matches(".site-footer")) {
       delete root.dataset.pageEnter;
     }
   }
@@ -52,22 +57,61 @@
   document.addEventListener("animationend", clearArrival);
   document.addEventListener("animationcancel", clearArrival);
 
+  function pagePath(url) {
+    return url.pathname.replace(/\/(?:index\.html)?$/, "");
+  }
+
+  // Seules une liste et ses propres fiches partagent un titre, même sous un préfixe de déploiement.
+  function hierarchyTitle(otherHref) {
+    if (!otherHref) return;
+    const other = new URL(otherHref);
+    if (other.origin !== location.origin) return;
+    const path = pagePath(other);
+    const parentTab = document.querySelector('.pivot a[aria-current="location"]');
+    if (parentTab && pagePath(parentTab) === path) return document.querySelector(".detail-heading h1");
+
+    const links = document.querySelectorAll(".landing-page :is(.project-card, .article-row)");
+    const item = Array.from(links).find((link) => pagePath(link) === path);
+    return item?.querySelector("h3, .article-title");
+  }
+
+  function shareTitle(viewTransition, title) {
+    delete root.dataset.pageEnter;
+    viewTransition.types.add("detail");
+    // Une fiche longue peut être quittée ou restaurée loin de son titre.
+    const bounds = title.getBoundingClientRect();
+    if (bounds.bottom <= 0 || bounds.top >= root.clientHeight) return;
+    title.style.viewTransitionName = "detail-title";
+    viewTransition.finished.then(() => title.style.removeProperty("view-transition-name"));
+  }
+
   function skipNativeTransition(viewTransition) {
     // La promesse ready est rejetée quand la transition native est annulée.
     viewTransition.ready.catch(() => {});
     viewTransition.skipTransition();
   }
 
-  window.addEventListener("pageswap", ({ viewTransition }) => {
-    if (departure && viewTransition) skipNativeTransition(viewTransition);
+  window.addEventListener("pageswap", ({ viewTransition, activation }) => {
+    if (!viewTransition) return;
+    if (departure) return skipNativeTransition(viewTransition);
+    const title = canShareTitle && motion.matches && hierarchyTitle(activation?.entry?.url);
+    if (title) shareTitle(viewTransition, title);
   });
 
   window.addEventListener("pagereveal", ({ viewTransition }) => {
     const activation = window.navigation?.activation;
-    if (!motion.matches || !viewTransition || activation?.navigationType !== "traverse" || !activation.from) return;
+    if (!motion.matches || !activation?.from) return;
+    const title = hierarchyTitle(activation.from.url);
+    if (title && canShareTitle && viewTransition) return shareTitle(viewTransition, title);
+    if (title) {
+      root.dataset.pageEnter = "fade";
+    } else if (viewTransition && activation.navigationType === "traverse") {
+      root.dataset.pageEnter = activation.entry.index < activation.from.index ? "backward" : "forward";
+    } else {
+      return;
+    }
 
-    root.dataset.pageEnter = activation.entry.index < activation.from.index ? "backward" : "forward";
-    skipNativeTransition(viewTransition);
+    if (viewTransition) skipNativeTransition(viewTransition);
   });
 
   window.addEventListener("pagehide", () => {
@@ -87,14 +131,20 @@
       return;
     }
 
+    const title = hierarchyTitle(link.href);
+    if (title && canShareTitle) {
+      clearDeparture();
+      delete root.dataset.pageEnter;
+      return;
+    }
+
     const pivotLinks = Array.from(document.querySelectorAll(".pivot a[href]"));
     const currentIndex = pivotLinks.findIndex((item) => item.hasAttribute("aria-current"));
     // Les fiches reprennent l’onglet de leur rubrique, y compris sous un préfixe de déploiement.
     const nextTab = pivotLinks.filter((item) => link.pathname.startsWith(item.pathname))
       .sort((a, b) => b.pathname.length - a.pathname.length)[0];
     const nextIndex = pivotLinks.indexOf(nextTab);
-    const returnsToSection = nextTab?.pathname === link.pathname && nextIndex === currentIndex && nextTab.getAttribute("aria-current") === "location";
-    const movesBackward = link.relList.contains("prev") || (nextIndex >= 0 && (nextIndex < currentIndex || returnsToSection));
+    const movesBackward = link.relList.contains("prev") || (nextIndex >= 0 && nextIndex < currentIndex);
 
     event.preventDefault();
     const currentTab = pivotLinks[currentIndex];
@@ -105,13 +155,14 @@
       currentTab.style.setProperty("--tab-y", `${to.bottom - from.bottom}px`);
       currentTab.style.setProperty("--tab-scale", to.width / from.width);
     }
-    const next = { href: link.href, direction: movesBackward ? "backward" : "forward" };
+    const direction = title ? "fade" : (movesBackward ? "backward" : "forward");
+    const next = { href: link.href, direction };
     departure = next;
     delete root.dataset.pageEnter;
     root.dataset.pageExit = next.direction;
 
     const main = document.getElementById("contenu");
-    const animation = main?.getAnimations?.().find((item) => item.animationName === "page-slide-out");
+    const animation = main?.getAnimations?.().find((item) => ["page-slide-out", "page-fade-out"].includes(item.animationName));
     await animation?.finished.catch(() => {});
     if (departure !== next) return;
 
@@ -154,7 +205,7 @@
       
     </div>
     <h1>Lecture : The Snowball Effect</h1>
-    <p class="page-lead">Ce que je retiens de la biographie de Warren Buffett, de ses premiers investissements à sa façon de choisir et de gérer des entreprises.</p>
+    <p class="page-lead">Un retour sur la biographie de Warren Buffett, de ses premiers investissements à sa façon de choisir et de gérer des entreprises.</p>
     
   </header>
   <div class="article-body"><div data-enter-block="with-previous" style="--enter-index: 0"><p>J'aurai mis un peu plus d'un an à lire la biographie de Warren Buffett. Elle couvre 80 ans de la vie d'un homme très actif qui aura fait de nombreuses rencontres. Le livre va en profondeur sur les différents business qu'aura rachetés Warren Buffett ainsi que sur toutes les personnes qu'il aura croisées et avec lesquelles il aura travaillé.
@@ -293,7 +344,7 @@ THE SOFTWARE.
         if (!entry.isIntersecting) return;
         observer.disconnect();
         // Sur une page courte, attendre la fin de l’entrée du pied de page.
-        const arrival = footer.getAnimations?.().find((animation) => animation.animationName === "page-slide-in");
+        const arrival = footer.getAnimations?.().find((animation) => ["page-slide-in", "page-fade-in"].includes(animation.animationName));
         if (arrival) await arrival.finished.catch(() => {});
         list.dataset.socialReveal = "visible";
       });
