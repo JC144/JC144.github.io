@@ -63,6 +63,26 @@ main:focus { outline: none; }
 
 .site-header { position: relative; z-index: 1; border-bottom: 1px solid var(--rule); }
 
+.brand-row { display: flex; width: fit-content; }
+
+.language-switch {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: flex-start;
+  justify-content: flex-end;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: .25rem .5rem 0 0;
+  color: var(--muted);
+  font-size: .875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.language-switch:hover { text-decoration: underline; text-underline-offset: .2em; }
+.language-switch:focus-visible { outline-offset: -3px; }
+
 .brand {
   display: flex;
   align-items: center;
@@ -325,6 +345,8 @@ main:focus { outline: none; }
 .article-list, .topic-list, .timeline { border-top: 1px solid var(--rule); }
 .article-list > li, .topic-list > li, .timeline > li { border-bottom: 1px solid var(--rule); }
 
+.rss-link, .article-row > .tilt-surface { padding-inline: .25rem; }
+
 .article-row {
   display: block;
   text-decoration: none;
@@ -337,7 +359,7 @@ main:focus { outline: none; }
   align-items: center;
   gap: .75rem 1rem;
   min-height: 5rem;
-  padding: 1rem .25rem;
+  padding-block: 1rem;
 }
 
 @media (width > 42rem), (orientation: landscape) {
@@ -458,18 +480,21 @@ main:focus { outline: none; }
 }
 
 @media (max-width: 42rem) {
+  .brand-row {
+    width: auto;
+    margin-inline: calc(-1 * var(--gutter));
+    background: var(--accent);
+  }
+  .brand { flex: 1; padding-inline: var(--gutter); }
+  .language-switch { color: var(--background); }
+  .language-switch:focus-visible { outline-color: currentColor; }
+
   .hero { grid-template-columns: 1fr; }
   .hero-visual { grid-area: 2 / 1; aspect-ratio: 3.5; background-position: center 65%; }
   .hero-inner { padding-block: 2.9rem 2.5rem; }
 }
 
 @media (max-width: 42rem) and (orientation: portrait) {
-  .brand {
-    width: auto;
-    margin-inline: calc(-1 * var(--gutter));
-    padding-inline: var(--gutter);
-  }
-
   .hero-visual { display: none; }
   .experience-nav-links { flex-direction: column; }
   .tilt-link, .section-title-link { -webkit-tap-highlight-color: transparent; }

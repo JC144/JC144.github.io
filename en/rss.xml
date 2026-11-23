@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Articles by Jean-Christophe VASSELON</title>
+    <link>https://jc.vasselon.com/en/articles/</link>
+    <description>The latest articles by Jean-Christophe VASSELON.</description>
+    <language>en</language>
+    <atom:link href="https://jc.vasselon.com/en/rss.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>The Age of On-Demand Apps</title>
+      <link>https://jc.vasselon.com/en/articles/the-age-of-on-demand-apps/</link>
+      <guid isPermaLink="true">https://jc.vasselon.com/en/articles/the-age-of-on-demand-apps/</guid>
+      <pubDate>Tue, 10 Nov 2026 00:00:00 GMT</pubDate>
+      <description>Is the era of off-the-shelf software over?</description>
+    </item>
+    <item>
+      <title>Tetris Plus</title>
+      <link>https://jc.vasselon.com/en/articles/tetris-plus/</link>
+      <guid isPermaLink="true">https://jc.vasselon.com/en/articles/tetris-plus/</guid>
+      <pubDate>Tue, 03 Nov 2026 00:00:00 GMT</pubDate>
+      <description>Can AI do it? Let’s add colour to a Game Boy game.</description>
+    </item>
+    <item>
+      <title>Reading The Snowball Effect</title>
+      <link>https://jc.vasselon.com/en/articles/warren-buffett-biography/</link>
+      <guid isPermaLink="true">https://jc.vasselon.com/en/articles/warren-buffett-biography/</guid>
+      <pubDate>Mon, 20 May 2019 00:00:00 GMT</pubDate>
+      <description>Notes on Warren Buffett’s biography, from his earliest investments to how he chose and ran businesses.</description>
+    </item>
+    <item>
+      <title>The Innovator’s Dilemma</title>
+      <link>https://jc.vasselon.com/en/articles/the-innovators-dilemma/</link>
+      <guid isPermaLink="true">https://jc.vasselon.com/en/articles/the-innovators-dilemma/</guid>
+      <pubDate>Fri, 02 Feb 2018 00:00:00 GMT</pubDate>
+      <description>Clayton Christensen uses a series of examples to show how an innovation can bring down the giants that dominate a market.</description>
+    </item>
+    <item>
+      <title>How to Win a Startup Weekend</title>
+      <link>https://jc.vasselon.com/en/articles/how-to-win-a-startup-weekend/</link>
+      <guid isPermaLink="true">https://jc.vasselon.com/en/articles/how-to-win-a-startup-weekend/</guid>
+      <pubDate>Wed, 24 Feb 2016 00:00:00 GMT</pubDate>
+      <description>From Friday’s opening pitch to Sunday’s presentation to the judges, here’s how to make the most of the 54 hours of a Startup Weekend.</description>
+    </item>
+  </channel>
+</rss>

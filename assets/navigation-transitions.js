@@ -99,7 +99,7 @@
     if (!(link instanceof HTMLAnchorElement) || (link.target && link.target !== "_self") || link.hasAttribute("download")) return;
 
     const movesToAnotherPage = link.pathname !== location.pathname || link.search !== location.search;
-    if (!motion.matches || link.origin !== location.origin || !["http:", "https:"].includes(link.protocol) || !movesToAnotherPage) {
+    if (!motion.matches || link.hasAttribute("hreflang") || link.origin !== location.origin || !["http:", "https:"].includes(link.protocol) || !movesToAnotherPage) {
       clearDeparture();
       return;
     }
