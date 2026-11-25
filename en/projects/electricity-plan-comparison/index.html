@@ -8,7 +8,7 @@
   
   
 <title>Electricity plan comparison tool · Jean-Christophe VASSELON</title>
-<meta name="description" content="Compare more than 50 electricity plans using actual readings from your Linky meter. The calculations run in your browser and your data stays there.">
+<meta name="description" content="Compare more than 140 electricity plans using readings from your Linky smart meter. The calculations run in your browser and your data stays there.">
 <link rel="canonical" href="https://jc.vasselon.com/projets/comparateur-electricite/">
 <link rel="alternate" hreflang="fr" href="https://jc.vasselon.com/projets/comparateur-electricite/">
 <link rel="alternate" hreflang="en" href="https://jc.vasselon.com/en/projects/electricity-plan-comparison/">
@@ -20,13 +20,13 @@
 <meta property="og:site_name" content="Jean-Christophe VASSELON">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Electricity plan comparison tool">
-<meta property="og:description" content="Compare more than 50 electricity plans using actual readings from your Linky meter. The calculations run in your browser and your data stays there.">
+<meta property="og:description" content="Compare more than 140 electricity plans using readings from your Linky smart meter. The calculations run in your browser and your data stays there.">
 <meta property="og:url" content="https://jc.vasselon.com/en/projects/electricity-plan-comparison/">
 <meta property="og:image" content="https://jc.vasselon.com/assets/projects/comparateur-electricite.png">
 <meta property="og:image:alt" content="Electricity plan comparison tool logo">
 
 <meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Electricity plan comparison tool","description":"Compare more than 50 electricity plans using actual readings from your Linky meter. The calculations run in your browser and your data stays there.","url":"https://jc.vasselon.com/en/projects/electricity-plan-comparison/","inLanguage":"en","mainEntity":{"@type":"WebApplication","name":"Electricity plan comparison tool","description":"Compare more than 50 electricity plans using actual readings from your Linky meter. The calculations run in your browser and your data stays there.","creator":{"@type":"Person","@id":"https://jc.vasselon.com/experiences/#person","name":"Jean-Christophe VASSELON","url":"https://jc.vasselon.com/en/experience/","sameAs":["https://www.linkedin.com/in/jvasselon/","https://github.com/JC144","https://x.com/JCVasselon"]},"url":"https://comparateur-abonnements-electricite.fr/","image":"https://jc.vasselon.com/assets/projects/comparateur-electricite.png"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Electricity plan comparison tool","description":"Compare more than 140 electricity plans using readings from your Linky smart meter. The calculations run in your browser and your data stays there.","url":"https://jc.vasselon.com/en/projects/electricity-plan-comparison/","inLanguage":"en","mainEntity":{"@type":"WebApplication","name":"Electricity plan comparison tool","description":"Compare more than 140 electricity plans using readings from your Linky smart meter. The calculations run in your browser and your data stays there.","creator":{"@type":"Person","@id":"https://jc.vasselon.com/experiences/#person","name":"Jean-Christophe VASSELON","url":"https://jc.vasselon.com/en/experience/","sameAs":["https://www.linkedin.com/in/jvasselon/","https://github.com/JC144","https://x.com/JCVasselon"]},"url":"https://comparateur-abonnements-electricite.fr/","image":"https://jc.vasselon.com/assets/projects/comparateur-electricite.png"}}</script>
 
   <link rel="stylesheet" href="/assets/styles.css">
   
@@ -68,7 +68,7 @@
       
     </div>
     <h1>Electricity plan comparison tool</h1>
-    <p class="page-lead">Compare more than 50 electricity plans using actual readings from your Linky meter. The calculations run in your browser and your data stays there.</p>
+    <p class="page-lead">Compare more than 140 electricity plans using readings from your Linky smart meter. The calculations run in your browser and your data stays there.</p>
     
   </header>
   <div class="article-body"><div data-enter-block="with-previous" style="--enter-index: 0"><div class="project-links">
@@ -80,20 +80,21 @@
     
   </div>
 
-
-  <p>The tool uses your own Linky smart meter readings to calculate what you would have paid over a year on each electricity plan. The comparison reflects your household’s actual usage.</p>
+<p>The tool uses your own Linky smart meter readings to calculate what you would have paid over a year on each electricity plan. The comparison reflects your household’s actual usage.</p>
 </div><section data-enter-block="" style="--enter-index: 1"><h2>What it does</h2>
 <ul>
-<li>Compares 53 plans from 9 suppliers, including EDF’s regulated tariffs (Bleu, Tempo and EJP), market-rate plans and tariffs maintained by the community.</li>
+<li>Compares more than 140 plans from over 30 suppliers using your exported meter readings.</li>
 <li>Accounts for each day’s actual Tempo colour, EJP peak days and each contract’s off-peak hours.</li>
 <li>Uses actual EPEX spot prices for plans tied to the wholesale electricity market.</li>
-<li>Ranks plans by annual cost and prorates the subscription charge to the day.</li>
+<li>Ranks plans by annual cost, prorating the standing charge by the day.</li>
+<li>Runs entirely in your browser to keep your meter readings private.</li>
 </ul>
-</section><section data-enter-block="" style="--enter-index: 2"><h2>How it works</h2>
-<p>Import half-hourly usage data from EDF, Enedis, TotalEnergies, Strasbourg Électricité Réseaux or Home Assistant. You can also retrieve those readings from your Enedis account using a script that runs in your browser. Enter the power rating on your contract and your off-peak hours to see how the plans rank.</p>
-</section><section data-enter-block="" style="--enter-index: 3"><h2>Runs entirely in your browser</h2>
-<p>Your Linky data stays in your browser. The tool is free, requires no account and uses no cookies, trackers, analytics or advertising. It receives no payments from energy suppliers.</p>
-
+</section><section data-enter-block="" style="--enter-index: 2"><h2>Technical details</h2>
+<p>I started the project in 2023 using vanilla JavaScript. Coverage in the tech press soon helped it reach a wider audience. What began as a solo project now has 20 contributors and more than 140 stars on GitHub.</p>
+<p>As the project grew, managing contributions became part of my work. That means guiding contributors, setting up a code review process and learning when to say no to an enthusiastic contributor. It also means putting tests in place to catch regressions, check that the tool works as expected and make it easier to work together.</p>
+<p>2026 was a turning point. AI took a leap forward, and so did the project. Supporting more than 140 plans, each with its own pricing rules, pushed me to rework the code so I could automate tariff imports.</p>
+<p>To add a plan, I start with the tariff sheet published by the supplier. I use AI to help write the code that extracts the prices and the tests that check it reads them correctly. On subsequent updates, the code reads the sheet using the same rules. If a price is ambiguous, the import stops for that sheet. The tests also rerun a simulation on historical meter readings and compare the results with a reference run. That lets me review the changes before approving them.</p>
+<p><em>Fun fact:</em> On one tariff sheet, the standing charge for the off-peak plan, including tax, was printed in the neighbouring table. The importer could have picked up the price from the row above. The updated test harness reproduces that layout error and checks that the import stops if the amounts disagree.</p>
 
 
   </section></div>
@@ -101,7 +102,7 @@
 </article>
 
   </main>
-  <footer class="site-footer" data-enter-block="with-previous" style="--enter-index: 3">
+  <footer class="site-footer" data-enter-block="with-previous" style="--enter-index: 2">
     <div class="frame footer-inner">
       <span class="footer-name">Jean-Christophe<br>VASSELON</span>
       <ul class="social-list" role="list" aria-label="Social profiles">
